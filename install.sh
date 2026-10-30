@@ -55,7 +55,8 @@ data="${XDG_DATA_HOME:-$HOME/.local/share}"
 app_dir="$data/heard"          # also holds engine/ and history.jsonl, which updates keep
 bin_dir="$HOME/.local/bin"
 desktop="$data/applications/$APP_ID.desktop"
-icon="$data/icons/hicolor/symbolic/apps/$APP_ID-symbolic.svg"
+icons="$data/icons/hicolor"
+icon_files=("scalable/apps/$APP_ID.svg" "symbolic/apps/$APP_ID-symbolic.svg")
 unit="${XDG_CONFIG_HOME:-$HOME/.config}/systemd/user/heard.service"
 ext_uuid=$(sed -n 's/.*"uuid": *"\([^"]*\)".*/\1/p' "$src/gnome-extension/metadata.json")
 ext_dir="$data/gnome-shell/extensions/$ext_uuid"
@@ -158,7 +159,7 @@ if has --uninstall; then
   stop_running
   [ -d "$app_dir/heard" ] && shortcuts remove >/dev/null 2>&1 || true
   ext_set_enabled 0
-  rm -rf "$app_dir/heard" "$app_dir/engine" "$app_dir/install.sh" "$bin_dir/heard" "$desktop" "$unit" "$ext_dir" "$icon"
+  rm -rf "$app_dir/heard" "$app_dir/engine" "$app_dir/install.sh" "$bin_dir/heard" "$desktop" "$unit" "$ext_dir" "${icon_files[@]/#/$icons/}"
   systemctl --user daemon-reload 2>/dev/null || true
   say "Heard removed. Your settings and transcript history were left in place."
   models="${XDG_CACHE_HOME:-$HOME/.cache}/heard"
@@ -184,8 +185,8 @@ install -m 755 "$src/bin/heard" "$bin_dir/heard"
 
 sed "s|Exec=heard|Exec=$bin_dir/heard|" "$src/data/$APP_ID.desktop" > "$desktop"
 update-desktop-database "$(dirname "$desktop")" 2>/dev/null || true
-install -Dm644 "$src/data/icons/hicolor/symbolic/apps/$APP_ID-symbolic.svg" "$icon"
-gtk-update-icon-cache -q -t "$data/icons/hicolor" 2>/dev/null || true
+for f in "${icon_files[@]}"; do install -Dm644 "$src/data/icons/hicolor/$f" "$icons/$f"; done
+gtk-update-icon-cache -q -t "$icons" 2>/dev/null || true
 
 if [[ "${XDG_CURRENT_DESKTOP:-}" == *GNOME* ]]; then
   say "Installing the GNOME Shell extension"

@@ -32,8 +32,9 @@ install -Dm755 "$src/bin/heard" "$root/usr/bin/heard"
 
 install -Dm644 "$src/data/$app_id.desktop" "$root/usr/share/applications/$app_id.desktop"
 install -Dm644 "$src/data/$app_id.metainfo.xml" "$root/usr/share/metainfo/$app_id.metainfo.xml"
-install -Dm644 "$src/data/icons/hicolor/symbolic/apps/$app_id-symbolic.svg" \
-  "$root/usr/share/icons/hicolor/symbolic/apps/$app_id-symbolic.svg"
+for f in "scalable/apps/$app_id.svg" "symbolic/apps/$app_id-symbolic.svg"; do
+  install -Dm644 "$src/data/icons/hicolor/$f" "$root/usr/share/icons/hicolor/$f"
+done
 
 ext="$root/usr/share/gnome-shell/extensions/$ext_uuid"
 install -d "$ext"

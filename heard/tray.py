@@ -18,14 +18,15 @@ ICON = "io.github.jksnetwork.Heard-symbolic"
 
 
 def icon_theme_path():
-    """The icon theme folder holding Heard's icon: the checkout's own, the per-user
-    install's or the package's. Told to the panel, so it finds the icon right away."""
+    """The icons folder (the parent of hicolor/) holding Heard's icon: the checkout's
+    own, the per-user install's or the package's. Told to the panel, so it finds the
+    icon right away; panels look for themes inside it, so it must not be hicolor/ itself."""
     candidates = [Path(__file__).resolve().parent.parent / "data" / "icons",
                   Path(os.environ.get("XDG_DATA_HOME") or Path.home() / ".local/share") / "icons",
                   Path("/usr/share/icons")]
     for root in candidates:
         if (root / "hicolor" / "symbolic" / "apps" / f"{ICON}.svg").exists():
-            return str(root / "hicolor")
+            return str(root)
     return ""
 
 ITEM_XML = """

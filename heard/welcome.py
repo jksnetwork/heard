@@ -42,7 +42,7 @@ class WelcomeWindow(Adw.Window):
         page = Adw.PreferencesPage()
         # a plain box: a compact StatusPage gets clipped inside a preferences group
         hero = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8, margin_bottom=6)
-        hero.append(Gtk.Image(icon_name="audio-input-microphone-symbolic", pixel_size=64,
+        hero.append(Gtk.Image(icon_name="io.github.jksnetwork.Heard-symbolic", pixel_size=64,
                               css_classes=["accent"], margin_bottom=8))
         hero.append(Gtk.Label(label="Welcome to Heard", css_classes=["title-1"]))
         hero.append(Gtk.Label(label="Press a shortcut, speak, press it again: your words are typed wherever "

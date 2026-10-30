@@ -43,7 +43,7 @@ class HistoryWindow(Adw.ApplicationWindow):
         clamp = Adw.Clamp(child=self.list, maximum_size=640, margin_top=18, margin_bottom=18,
                           margin_start=12, margin_end=12)
         scroller = Gtk.ScrolledWindow(hscrollbar_policy=Gtk.PolicyType.NEVER, vexpand=True, child=clamp)
-        self.empty = Adw.StatusPage(icon_name="audio-input-microphone-symbolic", title="Nothing dictated yet",
+        self.empty = Adw.StatusPage(icon_name="io.github.jksnetwork.Heard-symbolic", title="Nothing dictated yet",
                                     description="Press the dictation shortcut, speak, and press it again. "
                                                 "Your transcripts show up here.")
         self.stack = Gtk.Stack()

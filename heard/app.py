@@ -34,7 +34,7 @@ from .output import DESCRIPTIONS, Output  # noqa: E402
 from .settings import SettingsWindow, model_label  # noqa: E402
 from .shell import ShellHelper  # noqa: E402
 from .transcripts import Transcripts  # noqa: E402
-from .tray import Tray  # noqa: E402
+from .tray import Tray, icon_theme_path  # noqa: E402
 from .welcome import WelcomeWindow  # noqa: E402
 
 APP_ID = "io.github.jksnetwork.Heard"
@@ -106,6 +106,10 @@ class HeardApp(Adw.Application):
         provider.load_from_string(CSS)
         Gtk.StyleContext.add_provider_for_display(
             Gdk.Display.get_default(), provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
+        icons = icon_theme_path()
+        if icons:
+            # Heard's own icons, also when running from a checkout
+            Gtk.IconTheme.get_for_display(Gdk.Display.get_default()).add_search_path(icons)
         self.engine = Engine(self.config, on_status=self.on_engine_status)
         self.recorder = recorder.Recorder(self.config, on_level=self.on_level,
                                           on_auto_stop=lambda: GLib.idle_add(self.on_auto_stop))
@@ -358,7 +362,7 @@ class HeardApp(Adw.Application):
             engine = "installed, model not loaded" if self.engine.installed() else "not installed"
         about = Adw.AboutWindow(
             application_name="Heard",
-            application_icon="audio-input-microphone",
+            application_icon=APP_ID,
             version=__version__,
             comments="Speech-to-text dictation for Linux, running on your own computer.",
             website="https://github.com/jksnetwork/heard",
