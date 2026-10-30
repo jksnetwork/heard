@@ -5,6 +5,9 @@ headless nested shell, with the speech engine installed:
 
     HEARD_NESTED_HEADLESS=1 tools/nested-shell.sh python3 tools/dictation_test.py SPEECH.wav "expected words"
 
+With --auto-stop, `heard stop` is never sent: the silence after the recording
+has to end the dictation (silence_stop is set to 2 seconds).
+
 Uses throwaway settings and history; your own are left alone.
 """
 
@@ -28,7 +31,9 @@ MIC = "HeardTestMic"
 
 
 def main():
-    wav, expected = sys.argv[1], sys.argv[2].lower()
+    auto_stop = "--auto-stop" in sys.argv
+    wav, expected = [a for a in sys.argv[1:] if a != "--auto-stop"][:2]
+    expected = expected.lower()
     data_home = tempfile.mkdtemp(prefix="heard-test-")
     real_data = Path(os.environ.get("XDG_DATA_HOME") or Path.home() / ".local/share")
     os.environ.setdefault("HEARD_ENGINE_DIR", str(real_data / "heard" / "engine"))
@@ -36,7 +41,8 @@ def main():
     config_dir = Path(os.environ["XDG_CONFIG_HOME"]) / "heard"  # private in the nested session
     config_dir.mkdir(parents=True, exist_ok=True)
     (config_dir / "config.json").write_text(json.dumps({
-        "microphone": MIC, "welcomed": True, "show_tray": False, "sounds": False, "preload": True}))
+        "microphone": MIC, "welcomed": True, "show_tray": False, "sounds": False, "preload": True,
+        "silence_stop": 2.0 if auto_stop else 0}))
 
     loopback = subprocess.Popen([
         "pw-loopback", "-n", "heardtest",
@@ -64,12 +70,14 @@ def main():
             subprocess.run([HEARD, "start"], check=True)
             time.sleep(0.5)
             subprocess.run(["pw-play", "--target", "heardtest_in", wav], check=True)
-            time.sleep(0.5)
             stop = time.monotonic()
-            subprocess.run([HEARD, "stop"], check=True)
+            if not auto_stop:
+                time.sleep(0.5)
+                stop = time.monotonic()
+                subprocess.run([HEARD, "stop"], check=True)
             # done once text has arrived and stopped changing for half a second
             seen, steady_since = "", None
-            for _ in range(150):
+            for _ in range(200):
                 time.sleep(0.1)
                 GLib.idle_add(lambda: result.update(text=contents().strip()) and False)
                 now = result.get("text", "")
@@ -97,7 +105,7 @@ def main():
     history = Path(data_home) / "heard" / "history.jsonl"
     got = result.get("text", "")
     print("typed:   ", repr(got))
-    print(f"stop -> first text: {result.get('latency', 0):.2f} s")
+    print(f"{'end of speech' if auto_stop else 'stop'} -> first text: {result.get('latency', 0):.2f} s")
     if history.exists():
         print("history: ", history.read_text().strip())
     ok = expected in got.lower()
