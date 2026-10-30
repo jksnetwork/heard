@@ -242,6 +242,8 @@ class HeardApp(Adw.Application):
     def on_recorded(self, take, path, seconds):
         if take != self.take:
             return
+        debug(f"recorded {recorder.seconds_of(path) if path else 0:.1f} s, peak {self.recorder.peak_db:.0f} dB, "
+              f"speech {'yes' if self.recorder.heard_speech else 'no'}", self.stopped_at)
         if not path or recorder.seconds_of(path) < MIN_SECONDS or not self.recorder.heard_speech:
             if path:
                 Path(path).unlink(missing_ok=True)

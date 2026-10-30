@@ -72,6 +72,7 @@ class Recorder:
         self._quiet_since = None
         self._limit_id = 0
         self.heard_speech = False  # anything above SPEECH_DB in this take
+        self.peak_db = -100.0
 
     @property
     def active(self):
@@ -116,6 +117,7 @@ class Recorder:
         self._spoke = False
         self._quiet_since = None
         self.heard_speech = False
+        self.peak_db = -100.0
         if pipeline.set_state(Gst.State.PLAYING) == Gst.StateChangeReturn.FAILURE:
             self._teardown()
             self._discard()
@@ -174,6 +176,7 @@ class Recorder:
         if self.on_level:
             # -60 dB .. -10 dB mapped onto 0..1 for the meter
             self.on_level(min(1.0, max(0.0, (db + 60) / 50)))
+        self.peak_db = max(self.peak_db, db)
         if db > SPEECH_DB:
             self.heard_speech = True
         limit = self.config.silence_stop
