@@ -6,7 +6,8 @@ headless nested shell, with the speech engine installed:
     HEARD_NESTED_HEADLESS=1 tools/nested-shell.sh python3 tools/dictation_test.py SPEECH.wav "expected words"
 
 With --auto-stop, `heard stop` is never sent: the silence after the recording
-has to end the dictation (silence_stop is set to 2 seconds).
+has to end the dictation (silence_stop is set to 2 seconds). With --send, it
+finishes with `heard send` and checks that Enter was pressed after the text.
 
 Uses throwaway settings and history; your own are left alone.
 """
@@ -32,7 +33,8 @@ MIC = "HeardTestMic"
 
 def main():
     auto_stop = "--auto-stop" in sys.argv
-    wav, expected = [a for a in sys.argv[1:] if a != "--auto-stop"][:2]
+    send = "--send" in sys.argv
+    wav, expected = [a for a in sys.argv[1:] if not a.startswith("--")][:2]
     expected = expected.lower()
     data_home = tempfile.mkdtemp(prefix="heard-test-")
     real_data = Path(os.environ.get("XDG_DATA_HOME") or Path.home() / ".local/share")
@@ -74,12 +76,12 @@ def main():
             if not auto_stop:
                 time.sleep(0.5)
                 stop = time.monotonic()
-                subprocess.run([HEARD, "stop"], check=True)
+                subprocess.run([HEARD, "send" if send else "stop"], check=True)
             # done once text has arrived and stopped changing for half a second
             seen, steady_since = "", None
             for _ in range(200):
                 time.sleep(0.1)
-                GLib.idle_add(lambda: result.update(text=contents().strip()) and False)
+                GLib.idle_add(lambda: result.update(text=contents()) and False)
                 now = result.get("text", "")
                 if now and now == seen:
                     steady_since = steady_since or time.monotonic()
@@ -109,6 +111,10 @@ def main():
     if history.exists():
         print("history: ", history.read_text().strip())
     ok = expected in got.lower()
+    if send:
+        enter = got.endswith("\n") and not got.endswith(" \n")
+        print("Enter pressed, no space before it:", enter)
+        ok = ok and enter
     print("PASS" if ok else "FAIL")
     return 0 if ok else 1
 

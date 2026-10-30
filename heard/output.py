@@ -37,18 +37,19 @@ class Output:
     def config(self):
         return self.app.config
 
-    def deliver(self, content, callback):
-        """Type/paste/copy `content`; callback(method, error) with method in DESCRIPTIONS."""
+    def deliver(self, content, callback, enter=False):
+        """Type/paste/copy `content`, then press Enter if `enter`; callback(method, error)
+        with method in DESCRIPTIONS. (Only copying to the clipboard never presses Enter.)"""
         mode = resolve_mode(self.config.output, content)
         if mode is None:
             self.copy(content)
             callback("copied", None)
         elif self.app.shell.available():
-            self._with_shell(content, mode, callback)
+            self._with_shell(content, mode, enter, callback)
         elif platform.typing_tool():
-            self._with_tool(platform.typing_tool(), content, callback)
+            self._with_tool(platform.typing_tool(), content, enter, callback)
         elif self._portal_available():
-            self._with_portal(content, callback)
+            self._with_portal(content, enter, callback)
         else:
             self.copy(content)
             callback("copied", None)
@@ -67,7 +68,7 @@ class Output:
             from gi.repository import Gdk
             Gdk.Display.get_default().get_clipboard().set(content)
 
-    def _with_shell(self, content, mode, callback):
+    def _with_shell(self, content, mode, enter, callback):
         def done(result, error):
             if error:
                 # still give the user their words
@@ -78,14 +79,14 @@ class Output:
             if method == "typed" and self.config.copy_to_clipboard:
                 self.copy(content.rstrip())
             callback(method, None)
-        self.app.shell.call("TypeText", GLib.Variant("(ssb)", (content, mode, self.config.press_enter)), done)
+        self.app.shell.call("TypeText", GLib.Variant("(ssb)", (content, mode, enter)), done)
 
     def _portal_available(self):
         if self._portal_ok is None:
             self._portal_ok = portal.available()
         return self._portal_ok
 
-    def _with_portal(self, content, callback):
+    def _with_portal(self, content, enter, callback):
         if self._portal is None:
             self._portal = portal.PortalKeyboard(self.config)
 
@@ -96,7 +97,7 @@ class Output:
             else:
                 # no clipboard copy here: without focus or the extension GNOME would ignore it
                 callback("typed", None)
-        self._portal.type(content, self.config.press_enter, done)
+        self._portal.type(content, enter, done)
 
     def prepare(self):
         """Open the portal session now if it will be needed, so its permission
@@ -112,9 +113,7 @@ class Output:
         if self._portal is not None:
             self._portal.close()
 
-    def _with_tool(self, tool, content, callback):
-        enter = self.config.press_enter
-
+    def _with_tool(self, tool, content, enter, callback):
         def work():
             import time
             time.sleep(0.3)  # let go of the shortcut's keys first

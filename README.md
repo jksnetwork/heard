@@ -62,13 +62,14 @@ The first dictation downloads the speech model (1.6 GB for the default). After t
 | | |
 |---|---|
 | <kbd>Shift</kbd>+<kbd>Super</kbd>+<kbd>H</kbd> | Start dictating; press again to stop and type the text |
-| Click ■ on the pill | Stop and type |
+| <kbd>Shift</kbd>+<kbd>Super</kbd>+<kbd>Enter</kbd> | Stop, type the text **and press Enter** (sends a chat prompt). Also starts dictating. |
+| Click ■ / ➤ on the pill | Stop and type / stop, type and press Enter |
 | Click ✕ on the pill | Cancel, nothing is typed |
 
 "Cancel dictation" and "Type the last transcript again" can be bound to keys in Settings → Shortcuts. Everything is also in the tray menu and on the command line:
 
 ```
-heard toggle | start | stop | cancel | again | history | settings | welcome | quit
+heard toggle | send | start | stop | cancel | again | history | settings | welcome | quit
 ```
 
 📖 **The [user guide](docs/user-guide.md)** covers models, settings, other desktops and troubleshooting.

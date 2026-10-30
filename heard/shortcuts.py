@@ -27,6 +27,7 @@ BASE = "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/"
 # (id, description, default accelerator or None); id is also the `heard` action
 DEFAULTS = [
     ("toggle", "Start or stop dictation", "<Shift><Super>h"),
+    ("send", "Stop dictation and press Enter", "<Shift><Super>Return"),
     ("cancel", "Cancel dictation", None),
     ("again", "Type the last transcript again", None),
 ]
@@ -170,13 +171,16 @@ def instructions():
     launcher = _launcher()
     kind = platform.desktop()
     if kind == "kde":
-        return ("KDE Plasma picks up Heard's dictation shortcut (Meta+Shift+H) from its menu entry. "
-                "Change it in System Settings → Keyboard → Shortcuts → Heard.")
+        return ("KDE Plasma picks up Heard's shortcuts (Meta+Shift+H, and Meta+Shift+Return to also "
+                "press Enter) from its menu entry. Change them in System Settings → Keyboard → Shortcuts → Heard.")
     if kind == "hyprland":
-        return ("Add this to ~/.config/hypr/hyprland.conf:\n\n"
-                f"bind = SUPER SHIFT, H, exec, {launcher} toggle")
+        return ("Add these to ~/.config/hypr/hyprland.conf:\n\n"
+                f"bind = SUPER SHIFT, H, exec, {launcher} toggle\n"
+                f"bind = SUPER SHIFT, Return, exec, {launcher} send")
     if kind == "sway":
-        return f"Add this to your Sway config:\n\nbindsym $mod+Shift+h exec {launcher} toggle"
+        return ("Add these to your Sway config:\n\n"
+                f"bindsym $mod+Shift+h exec {launcher} toggle\n"
+                f"bindsym $mod+Shift+Return exec {launcher} send")
     return f"Bind a key to the command `{launcher} toggle` in your desktop's keyboard settings."
 
 

@@ -64,7 +64,7 @@ window.heard-overlay { background: transparent; }
 .heard-bar { min-width: 3px; border-radius: 2px; background: white; }
 """
 
-ACTIONS = ["toggle", "start", "stop", "cancel", "again", "history", "settings", "welcome", "launch",
+ACTIONS = ["toggle", "send", "start", "stop", "cancel", "again", "history", "settings", "welcome", "launch",
            "daemon", "quit"]
 
 
@@ -72,6 +72,7 @@ def build_parser():
     p = argparse.ArgumentParser(prog="heard", description="Speech-to-text dictation for Linux on Wayland")
     p.add_argument("action", nargs="?", default="toggle", choices=ACTIONS,
                    help="toggle (default): start dictating, or stop and type the text | "
+                        "send: start dictating, or stop, type the text and press Enter | "
                         "start | stop | cancel: discard the current dictation | "
                         "again: type the last transcript again | history: past transcripts | "
                         "settings | welcome: setup screen | launch: welcome on first run, else history | "
@@ -95,6 +96,7 @@ class HeardApp(Adw.Application):
         self.welcome = None
         self.state = "idle"  # idle | recording | transcribing
         self.stopped_at = 0.0
+        self.send = False  # press Enter after typing this dictation
         self.take = 0  # bumped per dictation, so a cancelled one's result is ignored
 
     def do_startup(self):
@@ -158,6 +160,8 @@ class HeardApp(Adw.Application):
                 self.open_welcome()
         elif action == "toggle":
             self.toggle()
+        elif action == "send":
+            self.toggle(send=True)
         elif action == "start":
             if self.state == "idle":
                 self.start()
@@ -191,9 +195,10 @@ class HeardApp(Adw.Application):
         if self.tray:
             self.tray.refresh()
 
-    def toggle(self):
+    def toggle(self, send=False):
+        """Start, or stop and type; `send` also presses Enter (only matters when stopping)."""
         if self.state == "recording":
-            self.stop()
+            self.stop(send)
         elif self.state == "idle":
             self.start()
         # while transcribing, a second press would only queue up confusion: ignore it
@@ -217,16 +222,17 @@ class HeardApp(Adw.Application):
             # load the model while you speak
             self.engine.preload()
 
-    def stop(self):
+    def stop(self, send=False):
         if self.state != "recording":
             return
         take = self.take
+        self.send = send or self.config.press_enter
         self.stopped_at = time.monotonic()
         debug("stop")
         self.set_state("transcribing")
         if self.config.sounds:
             recorder.chime(rising=False)
-        self.indicator.set_state("transcribing", "Transcribing…")
+        self.indicator.set_state("transcribing", "Transcribing and sending…" if self.send else "Transcribing…")
         self.recorder.stop(lambda path, seconds: self.on_recorded(take, path, seconds))
 
     def cancel(self):
@@ -285,7 +291,9 @@ class HeardApp(Adw.Application):
                 self.notify_error(f"Couldn't type the text ({problem}); it's on the clipboard.")
             elif method == "copied" and self.config.output != "clipboard":
                 self.toast("Copied " + text.preview(heard) + ". Paste it with Ctrl+V.")
-        self.output.deliver(text.finish(heard, self.config.trailing_space), delivered)
+        # a trailing space before Enter would only end up at the end of the sent prompt
+        self.output.deliver(text.finish(heard, self.config.trailing_space and not self.send), delivered,
+                            enter=self.send)
 
     def finish(self):
         self.set_state("idle")
@@ -304,7 +312,8 @@ class HeardApp(Adw.Application):
                 self.notify_error(f"Couldn't type the text ({problem}); it's on the clipboard.")
             elif method == "copied" and self.config.output != "clipboard":
                 self.toast("Copied. Paste it with Ctrl+V.")
-        self.output.deliver(text.finish(last["text"], self.config.trailing_space), delivered)
+        self.output.deliver(text.finish(last["text"], self.config.trailing_space), delivered,
+                            enter=self.config.press_enter)
 
     # -- feedback from the recorder, engine and indicator ------------------------------
 
@@ -320,6 +329,8 @@ class HeardApp(Adw.Application):
     def on_indicator_clicked(self, action):
         if action == "stop":
             self.stop()
+        elif action == "send":
+            self.stop(send=True)
         elif action == "cancel":
             self.cancel()
 

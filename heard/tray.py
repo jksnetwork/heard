@@ -122,7 +122,9 @@ class Tray:
     def entries(self):
         """(label, action) pairs; None is a separator."""
         app = self.app
-        entries = [("Stop and Transcribe" if app.recording else "Start Dictation", app.toggle)]
+        entries = [("Stop and Type" if app.recording else "Start Dictation", app.toggle)]
+        if app.recording:
+            entries.append(("Stop, Type and Press Enter", lambda: app.toggle(send=True)))
         if app.recording or app.transcribing:
             entries.append(("Cancel Dictation", app.cancel))
         return entries + [

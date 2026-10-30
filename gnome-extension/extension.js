@@ -88,10 +88,14 @@ class Indicator {
         this._stop = new St.Button({style_class: 'heard-button', can_focus: false,
             child: new St.Icon({icon_name: 'media-playback-stop-symbolic', icon_size: 14})});
         this._stop.connect('clicked', () => this._onClick('stop'));
+        // stop, type and press Enter (sends a chat prompt)
+        this._send = new St.Button({style_class: 'heard-button', can_focus: false,
+            child: new St.Icon({icon_name: 'mail-send-symbolic', icon_size: 14})});
+        this._send.connect('clicked', () => this._onClick('send'));
         this._cancel = new St.Button({style_class: 'heard-button', can_focus: false,
             child: new St.Icon({icon_name: 'window-close-symbolic', icon_size: 14})});
         this._cancel.connect('clicked', () => this._onClick('cancel'));
-        for (const child of [this._dot, this._label, this._meter, this._stop, this._cancel])
+        for (const child of [this._dot, this._label, this._meter, this._stop, this._send, this._cancel])
             this._box.add_child(child);
         Main.layoutManager.addTopChrome(this._box);
         this._state = 'hidden';
@@ -139,7 +143,7 @@ class Indicator {
         }
         this._dot.style_class = `heard-dot heard-${state}`;
         const recording = state === 'recording';
-        this._meter.visible = this._stop.visible = recording;
+        this._meter.visible = this._stop.visible = this._send.visible = recording;
         this._cancel.visible = state !== 'busy';
         if (recording && was !== 'recording') {
             this._started = GLib.get_monotonic_time();

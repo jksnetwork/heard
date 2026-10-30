@@ -10,12 +10,17 @@ Categories=Utility;Accessibility;GTK;
 Keywords=dictation;speech;voice;transcribe;whisper;speech-to-text;
 StartupNotify=false
 DBusActivatable=false
-Actions=toggle;history;settings;quit;
+Actions=toggle;send;history;settings;quit;
 
 [Desktop Action toggle]
 Name=Start/Stop Dictation
 Exec=heard toggle
 X-KDE-Shortcuts=Meta+Shift+H
+
+[Desktop Action send]
+Name=Stop Dictation and Press Enter
+Exec=heard send
+X-KDE-Shortcuts=Meta+Shift+Return
 
 [Desktop Action history]
 Name=History

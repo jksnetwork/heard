@@ -7,6 +7,8 @@
 3. Speak naturally, with punctuation in your voice; Whisper adds commas and full stops itself.
 4. Press the shortcut again (or click ■ on the pill). A falling tone plays, the pill turns amber while it transcribes, and the text is typed at the cursor.
 
+To send what you said right away (a chat or AI prompt), finish with <kbd>Shift</kbd>+<kbd>Super</kbd>+<kbd>Enter</kbd> instead, or click ➤ on the pill: the text is typed and Enter is pressed, without the usual trailing space. Either shortcut starts a dictation, and the one you finish with decides. To press Enter after every dictation, turn on Settings → Output → "Always press Enter after typing".
+
 Click ✕ on the pill to throw a dictation away. If you said nothing (or the microphone is muted), nothing is typed and a notification tells you.
 
 Pressing the shortcut while a dictation is being transcribed does nothing, so a double press can't start a stray recording.
@@ -42,7 +44,7 @@ The model is loaded when Heard starts (so the first dictation is instant) and fr
 
 Other output options:
 
-- **Press Enter after typing** sends chat prompts right away.
+- **Always press Enter after typing** sends every dictation right away. For just one, finish with <kbd>Shift</kbd>+<kbd>Super</kbd>+<kbd>Enter</kbd>.
 - **Add a space after** keeps consecutive dictations from running together.
 - **Also copy to the clipboard** keeps the last transcript there as well.
 
@@ -62,6 +64,7 @@ Other output options:
 
 ```
 heard toggle     start, or stop and type (the default action)
+heard send       start, or stop, type and press Enter
 heard start      start if idle
 heard stop       stop and type if recording
 heard cancel     discard the current dictation
@@ -75,8 +78,8 @@ All of these talk to the running instance (and start it if needed), so they're w
 
 - **KDE Plasma:** install `ydotool` and enable its daemon (`systemctl --user enable --now ydotool` on most distros; your user needs access to `/dev/uinput`). The shortcut comes from Heard's menu entry; change it in System Settings → Keyboard → Shortcuts. Install `gtk4-layer-shell` for the listening pill.
 - **Hyprland / Sway:** install `wtype` and `gtk4-layer-shell`, then bind a key:
-  - Hyprland: `bind = SUPER SHIFT, H, exec, heard toggle`
-  - Sway: `bindsym $mod+Shift+h exec heard toggle`
+  - Hyprland: `bind = SUPER SHIFT, H, exec, heard toggle` and `bind = SUPER SHIFT, Return, exec, heard send`
+  - Sway: `bindsym $mod+Shift+h exec heard toggle` and `bindsym $mod+Shift+Return exec heard send`
 - Without a typing tool, transcripts go to the clipboard (install `wl-clipboard` so that works without focus).
 
 ## Troubleshooting

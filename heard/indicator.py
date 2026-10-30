@@ -65,9 +65,12 @@ class _OverlayWindow(Gtk.Window):
             self.bars.append(bar)
         self.stop_btn = Gtk.Button(icon_name="media-playback-stop-symbolic", css_classes=["circular", "flat"])
         self.stop_btn.connect("clicked", lambda *_: app.toggle())
+        self.send_btn = Gtk.Button(icon_name="mail-send-symbolic", css_classes=["circular", "flat"],
+                                   tooltip_text="Stop, type and press Enter")
+        self.send_btn.connect("clicked", lambda *_: app.toggle(send=True))
         self.cancel_btn = Gtk.Button(icon_name="window-close-symbolic", css_classes=["circular", "flat"])
         self.cancel_btn.connect("clicked", lambda *_: app.cancel())
-        for child in (self.dot, self.label, self.meter, self.stop_btn, self.cancel_btn):
+        for child in (self.dot, self.label, self.meter, self.stop_btn, self.send_btn, self.cancel_btn):
             box.append(child)
         self.set_child(box)
         self.started = 0
@@ -87,6 +90,7 @@ class _OverlayWindow(Gtk.Window):
         self.dot.add_css_class(f"heard-{state}")
         self.meter.set_visible(recording)
         self.stop_btn.set_visible(recording)
+        self.send_btn.set_visible(recording)
         self.cancel_btn.set_visible(state != "busy")
         self.text = text
         if recording:

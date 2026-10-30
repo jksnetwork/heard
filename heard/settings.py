@@ -205,8 +205,8 @@ class SettingsWindow(Adw.PreferencesWindow):
                                "Straight quotes, hyphens and three dots instead of typographic ones"))
         output.add(self.switch("Add a space after", "trailing_space",
                                "So consecutive dictations don't run together"))
-        output.add(self.switch("Press Enter after typing", "press_enter",
-                               "Sends chat prompts right away"))
+        output.add(self.switch("Always press Enter after typing", "press_enter",
+                               "Or just once: finish with Shift+Super+Enter instead of Shift+Super+H"))
         output.add(self.switch("Also copy to the clipboard", "copy_to_clipboard"))
 
         general = Adw.PreferencesGroup(title="General")
