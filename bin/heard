@@ -1,0 +1,38 @@
+#!/bin/bash
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Launcher for Heard: runs from a checkout or the installed copy. See `heard --help`.
+
+here="$(dirname "$(readlink -f "$0")")"
+if [ -d "$here/../heard" ]; then
+    root="$here/.."                                      # running from a checkout
+elif [ -d "${XDG_DATA_HOME:-$HOME/.local/share}/heard/heard" ]; then
+    root="${XDG_DATA_HOME:-$HOME/.local/share}/heard"   # per-user install (install.sh)
+else
+    root=/usr/lib/heard                                  # system package (.deb)
+fi
+
+# Started from inside a snap (e.g. VS Code's terminal)? Shed its environment,
+# and move into our own cgroup so portals and notifications see a normal host app.
+if [[ "${GSETTINGS_SCHEMA_DIR:-}${GTK_PATH:-}" == */snap/* ]]; then
+    unset GSETTINGS_SCHEMA_DIR GTK_EXE_PREFIX GTK_PATH GTK_IM_MODULE_FILE GTK_MODULES GIO_MODULE_DIR LOCPATH
+    unset GDK_PIXBUF_MODULE_FILE GDK_PIXBUF_MODULEDIR GST_PLUGIN_PATH GST_PLUGIN_SYSTEM_PATH
+    unset SNAP SNAP_NAME SNAP_REVISION SNAP_INSTANCE_NAME
+    export XDG_DATA_DIRS="${XDG_DATA_DIRS_VSCODE_SNAP_ORIG:-/usr/local/share:/usr/share}"
+    export XDG_CONFIG_DIRS="${XDG_CONFIG_DIRS_VSCODE_SNAP_ORIG:-/etc/xdg}"
+fi
+if grep -q '/snap\.' /proc/self/cgroup 2>/dev/null && [ -z "$HEARD_SCOPED" ]; then
+    export HEARD_SCOPED=1
+    exec systemd-run --user --scope --quiet --collect "$0" "$@"
+fi
+
+# gtk4-layer-shell (the indicator on KDE/wlroots) must be loaded before
+# libwayland-client; GNOME doesn't support layer shell, so skip it there
+if [[ "${XDG_CURRENT_DESKTOP:-}" != *GNOME* ]]; then
+    lib=$(ldconfig -p 2>/dev/null | grep -o '/[^ ]*libgtk4-layer-shell\.so[.0-9]*' | head -1)
+    [ -n "$lib" ] && export LD_PRELOAD="$lib${LD_PRELOAD:+:$LD_PRELOAD}"
+fi
+
+# shortcuts registered with GNOME call this launcher by absolute path
+export HEARD_LAUNCHER="$(readlink -f "$0")"
+export PYTHONPATH="$root${PYTHONPATH:+:$PYTHONPATH}"
+exec python3 -m heard "$@"

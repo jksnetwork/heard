@@ -1,0 +1,53 @@
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+
+.heard-pill {
+  background-color: rgba(26, 26, 30, 0.92);
+  color: white;
+  border-radius: 99px;
+  padding: 6px 8px 6px 14px;
+  spacing: 10px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.heard-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 5px;
+  background-color: #ff3b30;
+}
+
+.heard-dot.heard-transcribing,
+.heard-dot.heard-busy {
+  background-color: #ffb340;
+}
+
+.heard-label {
+  font-weight: bold;
+  font-size: 10pt;
+  font-feature-settings: "tnum";
+  min-width: 34px;
+}
+
+.heard-meter {
+  spacing: 3px;
+  min-height: 14px;
+}
+
+.heard-bar {
+  width: 3px;
+  border-radius: 2px;
+  background-color: white;
+}
+
+.heard-button {
+  border-radius: 99px;
+  padding: 5px;
+  color: rgba(255, 255, 255, 0.85);
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+.heard-button:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: white;
+}

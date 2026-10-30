@@ -1,0 +1,30 @@
+[Desktop Entry]
+Type=Application
+Name=Heard
+GenericName=Dictation
+Comment=Speak instead of typing: speech to text into any app
+Exec=heard launch
+Icon=audio-input-microphone
+Terminal=false
+Categories=Utility;Accessibility;GTK;
+Keywords=dictation;speech;voice;transcribe;whisper;speech-to-text;
+StartupNotify=false
+DBusActivatable=false
+Actions=toggle;history;settings;quit;
+
+[Desktop Action toggle]
+Name=Start/Stop Dictation
+Exec=heard toggle
+X-KDE-Shortcuts=Meta+Shift+H
+
+[Desktop Action history]
+Name=History
+Exec=heard history
+
+[Desktop Action settings]
+Name=Settings
+Exec=heard settings
+
+[Desktop Action quit]
+Name=Quit Heard
+Exec=heard quit

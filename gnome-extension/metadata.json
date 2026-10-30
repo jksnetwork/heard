@@ -1,0 +1,13 @@
+{
+  "uuid": "heard@jksnetwork.github.io",
+  "name": "Heard helper",
+  "description": "Types dictated text into the focused window and shows a listening indicator for the Heard speech-to-text app.",
+  "shell-version": [
+    "45",
+    "46",
+    "47",
+    "48"
+  ],
+  "version": 1,
+  "url": "https://github.com/jksnetwork/heard"
+}

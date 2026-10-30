@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- SPDX-License-Identifier: CC0-1.0 -->
+<component type="desktop-application">
+  <id>io.github.jksnetwork.Heard</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0-or-later</project_license>
+  <name>Heard</name>
+  <summary>Dictate into any app with local speech recognition</summary>
+  <developer id="io.github.jksnetwork">
+    <name>jksnetwork</name>
+  </developer>
+  <description>
+    <p>
+      Heard is speech-to-text dictation for Linux on Wayland. Press a shortcut, speak,
+      and press it again: your words are typed wherever you were typing, whether that's
+      a terminal, a chat box or an AI prompt.
+    </p>
+    <ul>
+      <li>Whisper speech recognition running on your own computer, on an NVIDIA GPU when there is one</li>
+      <li>Text typed straight into the focused window, or pasted when it can't be typed</li>
+      <li>A small listening indicator with a level meter that never takes focus</li>
+      <li>Custom vocabulary for names and jargon</li>
+      <li>Optional stop on silence, sounds, and a tray icon</li>
+      <li>Searchable history of past transcripts (text only, never audio)</li>
+    </ul>
+    <p>
+      On GNOME a small Shell extension does the typing. KDE Plasma, Hyprland and Sway
+      are supported with ydotool or wtype.
+    </p>
+  </description>
+  <launchable type="desktop-id">io.github.jksnetwork.Heard.desktop</launchable>
+  <url type="homepage">https://github.com/jksnetwork/heard</url>
+  <url type="bugtracker">https://github.com/jksnetwork/heard/issues</url>
+  <url type="vcs-browser">https://github.com/jksnetwork/heard</url>
+  <provides>
+    <binary>heard</binary>
+  </provides>
+  <content_rating type="oars-1.1"/>
+  <supports>
+    <control>keyboard</control>
+    <control>voice</control>
+  </supports>
+  <releases>
+    <release version="0.1.0" date="2026-10-29">
+      <description>
+        <p>First release: local Whisper dictation with typing into the focused window,
+        a listening indicator, history, settings and a welcome screen.</p>
+      </description>
+    </release>
+  </releases>
+</component>
