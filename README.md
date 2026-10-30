@@ -84,6 +84,8 @@ heard toggle | send | start | stop | cancel | again | history | settings | welco
 
 Without a typing tool, transcripts go to the clipboard and a notification asks you to paste.
 
+GNOME is what Heard is developed and tested on. The KDE, Hyprland and Sway paths are written against those desktops' documented tools but haven't been tried there yet. If you use one of them, a report (working or not) is very welcome; see [CONTRIBUTING.md](CONTRIBUTING.md).
+
 ## How it works
 
 ```
@@ -103,6 +105,14 @@ The speech worker runs in its own Python environment (`~/.local/share/heard/engi
 
 - Python 3.10+, GTK 4, libadwaita 1.5+, PyGObject, GStreamer with the good plugins (Ubuntu 24.04, Fedora 40 or newer)
 - For GPU speed: an NVIDIA GPU with a recent driver (CUDA 12). Without one, pick a smaller model in Settings; `small.en` is quick on a modern CPU.
+
+## Contributing
+
+Bug reports, testing on other desktops and pull requests are welcome. [CONTRIBUTING.md](CONTRIBUTING.md) explains how to run Heard from a checkout, how the pieces fit together, and how to test without logging out. Please report security problems privately, as described in [SECURITY.md](SECURITY.md).
+
+## Credits
+
+Speech recognition is OpenAI's [Whisper](https://github.com/openai/whisper) (MIT), run with SYSTRAN's [faster-whisper](https://github.com/SYSTRAN/faster-whisper) (MIT) and [CTranslate2](https://github.com/OpenNMT/CTranslate2) (MIT). These, and the models, are downloaded when you set Heard up; they aren't part of this repository.
 
 ## License
 

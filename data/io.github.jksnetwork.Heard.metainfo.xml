@@ -35,6 +35,20 @@
   <provides>
     <binary>heard</binary>
   </provides>
+  <screenshots>
+    <screenshot type="default">
+      <caption>The listening indicator: timer, level meter, stop, send and cancel</caption>
+      <image>https://raw.githubusercontent.com/jksnetwork/heard/main/docs/images/indicator.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>Settings: model, language, vocabulary, microphone and output</caption>
+      <image>https://raw.githubusercontent.com/jksnetwork/heard/main/docs/images/settings.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>History of past transcripts</caption>
+      <image>https://raw.githubusercontent.com/jksnetwork/heard/main/docs/images/history.png</image>
+    </screenshot>
+  </screenshots>
   <content_rating type="oars-1.1"/>
   <supports>
     <control>keyboard</control>
