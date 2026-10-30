@@ -30,10 +30,16 @@ class TranscriptsTest(unittest.TestCase):
     def test_remove_and_clear(self):
         a = self.store.add("a", limit=10)
         self.store.add("b", limit=10)
-        self.store.remove(a["time"])
+        self.store.remove(a)
         self.assertEqual([e["text"] for e in self.store.load()], ["b"])
         self.store.clear()
         self.assertIsNone(self.store.last())
+
+    def test_remove_keeps_same_timestamp_twin(self):
+        with open(self.store.path, "w") as f:
+            f.write('{"time": 1.0, "text": "one"}\n{"time": 1.0, "text": "two"}\n')
+        self.store.remove({"time": 1.0, "text": "one"})
+        self.assertEqual([e["text"] for e in self.store.load()], ["two"])
 
     def test_corrupt_lines_skipped(self):
         self.store.add("good", limit=10)

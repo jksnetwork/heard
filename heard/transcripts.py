@@ -47,8 +47,12 @@ class Transcripts:
         entries = self.load()
         return entries[0] if entries else None
 
-    def remove(self, stamp):
-        self._write([e for e in self.load() if e.get("time") != stamp])
+    def remove(self, entry):
+        """Remove one entry (as returned by load() or add()); its twins with the same timestamp stay."""
+        entries = self.load()
+        if entry in entries:
+            entries.remove(entry)
+            self._write(entries)
 
     def clear(self):
         try:

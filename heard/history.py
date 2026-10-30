@@ -104,7 +104,7 @@ class HistoryWindow(Adw.ApplicationWindow):
         self.toasts.add_toast(Adw.Toast(title="Copied", timeout=2))
 
     def remove(self, row):
-        self.app.transcripts.remove(row.entry.get("time"))
+        self.app.transcripts.remove(row.entry)
         self.list.remove(row)
         if self.list.get_first_child() is None:
             self.stack.set_visible_child_name("empty")

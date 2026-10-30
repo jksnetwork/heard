@@ -2,17 +2,31 @@
 """Tray icon via StatusNotifierItem + com.canonical.dbusmenu, over plain D-Bus.
 
 Shown by KDE Plasma, Ubuntu's GNOME (AppIndicator extension), Waybar and most
-other panels. Clicking the icon opens the menu; the icon turns into a red
-record dot while dictating.
+other panels. The icon is Heard's ear; clicking it opens the menu, and it turns
+into a red record dot while dictating.
 """
 
 import os
+from pathlib import Path
 
 from gi.repository import Gio, GLib
 
 ITEM_PATH = "/StatusNotifierItem"
 MENU_PATH = "/MenuBar"
 WATCHER = "org.kde.StatusNotifierWatcher"
+ICON = "io.github.jksnetwork.Heard-symbolic"
+
+
+def icon_theme_path():
+    """The icon theme folder holding Heard's icon: the checkout's own, the per-user
+    install's or the package's. Told to the panel, so it finds the icon right away."""
+    candidates = [Path(__file__).resolve().parent.parent / "data" / "icons",
+                  Path(os.environ.get("XDG_DATA_HOME") or Path.home() / ".local/share") / "icons",
+                  Path("/usr/share/icons")]
+    for root in candidates:
+        if (root / "hicolor" / "symbolic" / "apps" / f"{ICON}.svg").exists():
+            return str(root / "hicolor")
+    return ""
 
 ITEM_XML = """
 <node>
@@ -22,6 +36,7 @@ ITEM_XML = """
     <property name="Title" type="s" access="read"/>
     <property name="Status" type="s" access="read"/>
     <property name="IconName" type="s" access="read"/>
+    <property name="IconThemePath" type="s" access="read"/>
     <property name="ToolTip" type="(sa(iiay)ss)" access="read"/>
     <property name="ItemIsMenu" type="b" access="read"/>
     <property name="Menu" type="o" access="read"/>
@@ -95,6 +110,7 @@ class Tray:
         self.bus = Gio.bus_get_sync(Gio.BusType.SESSION)
         self.name = f"org.kde.StatusNotifierItem-{os.getpid()}-1"
         self.revision = 1
+        self.icon_path = icon_theme_path()
         self.items = {}  # id -> (label, callback)
         self._reg_ids = []
         self._name_id = 0
@@ -184,7 +200,8 @@ class Tray:
             "Id": GLib.Variant("s", "heard"),
             "Title": GLib.Variant("s", "Heard"),
             "Status": GLib.Variant("s", "Active"),
-            "IconName": GLib.Variant("s", "media-record-symbolic" if recording else "audio-input-microphone-symbolic"),
+            "IconName": GLib.Variant("s", "media-record-symbolic" if recording else ICON),
+            "IconThemePath": GLib.Variant("s", self.icon_path),
             "ToolTip": GLib.Variant("(sa(iiay)ss)", ("", [], "Heard",
                                                       "Listening — click to stop" if recording else "Dictation")),
             "ItemIsMenu": GLib.Variant("b", True),
