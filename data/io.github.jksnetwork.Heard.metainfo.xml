@@ -55,6 +55,12 @@
     <control>voice</control>
   </supports>
   <releases>
+    <release version="0.1.1" date="2026-11-03">
+      <description>
+        <p>When the microphone sends no sound at all, as a muted headset does, the listening
+        indicator now says so instead of the take being silently skipped.</p>
+      </description>
+    </release>
     <release version="0.1.0" date="2026-10-29">
       <description>
         <p>First release: local Whisper dictation with typing into the focused window,
