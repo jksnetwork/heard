@@ -39,6 +39,8 @@ from .welcome import WelcomeWindow  # noqa: E402
 
 APP_ID = "io.github.jksnetwork.Heard"
 MIN_SECONDS = 0.4  # shorter takes are accidental double-presses
+FLAT_CHECK_MS = 1500  # how long a take may be completely silent before the pill says so
+MUTED_HINT = "No sound. Microphone muted?"
 DEBUG = bool(os.environ.get("HEARD_DEBUG"))
 
 
@@ -113,6 +115,7 @@ class HeardApp(Adw.Application):
             # Heard's own icons, also when running from a checkout
             Gtk.IconTheme.get_for_display(Gdk.Display.get_default()).add_search_path(icons)
         self.engine = Engine(self.config, on_status=self.on_engine_status)
+        self.muted_hint = False
         self.recorder = recorder.Recorder(self.config, on_level=self.on_level,
                                           on_auto_stop=lambda: GLib.idle_add(self.on_auto_stop))
         self.output = Output(self)
@@ -218,6 +221,8 @@ class HeardApp(Adw.Application):
         if self.config.sounds:
             recorder.chime(rising=True)
         self.indicator.set_state("recording")
+        self.muted_hint = False
+        GLib.timeout_add(FLAT_CHECK_MS, self._check_flat, self.take)
         if not self.engine.loaded and not self.engine.busy:
             # load the model while you speak
             self.engine.preload()
@@ -244,6 +249,13 @@ class HeardApp(Adw.Application):
         self.set_state("idle")
         self.indicator.set_state("hidden")
 
+    def _check_flat(self, take):
+        # a muted headset sends exact zeros, which otherwise looks like Heard ignoring you
+        if take == self.take and self.state == "recording" and self.recorder.flat:
+            self.muted_hint = True
+            self.indicator.set_state("recording", MUTED_HINT)
+        return False
+
     def on_auto_stop(self):
         if self.state == "recording":
             self.stop()
@@ -258,7 +270,10 @@ class HeardApp(Adw.Application):
             if path:
                 Path(path).unlink(missing_ok=True)
             self.finish()
-            if path and not self.recorder.heard_speech:
+            if path and self.recorder.flat:
+                self.toast("The microphone sent no sound at all. Is it muted, on the device or in another app? "
+                           "You can pick another one in Settings.")
+            elif path and not self.recorder.heard_speech:
                 self.toast("Didn't hear anything. Check the microphone in Settings.")
             return
         debug("recording closed", self.stopped_at)
@@ -318,6 +333,10 @@ class HeardApp(Adw.Application):
     # -- feedback from the recorder, engine and indicator ------------------------------
 
     def on_level(self, level):
+        if self.muted_hint and not self.recorder.flat:
+            self.muted_hint = False  # unmuted mid-take: back to the timer
+            if self.state == "recording":
+                self.indicator.set_state("recording")
         self.indicator.set_level(level)
 
     def on_engine_status(self, message):

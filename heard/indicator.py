@@ -85,6 +85,7 @@ class _OverlayWindow(Gtk.Window):
             self.set_visible(False)
             return
         recording = state == "recording"
+        was_recording = self.meter.get_visible() and self.get_visible()
         for css in ("heard-recording", "heard-transcribing", "heard-busy"):
             self.dot.remove_css_class(css)
         self.dot.add_css_class(f"heard-{state}")
@@ -94,8 +95,9 @@ class _OverlayWindow(Gtk.Window):
         self.cancel_btn.set_visible(state != "busy")
         self.text = text
         if recording:
-            self.started = GLib.get_monotonic_time()
-            self.set_level(0)
+            if not was_recording:
+                self.started = GLib.get_monotonic_time()
+                self.set_level(0)
             self._tick = GLib.timeout_add(500, self._update)
         self._update()
         self.present()

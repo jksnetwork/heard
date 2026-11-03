@@ -9,7 +9,7 @@
 
 To send what you said right away (a chat or AI prompt), finish with <kbd>Shift</kbd>+<kbd>Super</kbd>+<kbd>Enter</kbd> instead, or click ➤ on the pill: the text is typed and Enter is pressed, without the usual trailing space. Either shortcut starts a dictation, and the one you finish with decides. To press Enter after every dictation, turn on Settings → Output → "Always press Enter after typing".
 
-Click ✕ on the pill to throw a dictation away. If you said nothing (or the microphone is muted), nothing is typed and a notification tells you.
+Click ✕ on the pill to throw a dictation away. If you said nothing (or the microphone is muted), nothing is typed and a notification tells you. A microphone that sends no sound at all, which is what a muted headset does, is flagged on the pill after a second and a half: "No sound. Microphone muted?"
 
 Pressing the shortcut while a dictation is being transcribed does nothing, so a double press can't start a stray recording.
 
@@ -87,6 +87,8 @@ All of these talk to the running instance (and start it if needed), so they're w
 **GNOME asks to "allow remote interaction".** The extension isn't running yet (it loads at your next login), so Heard types through the desktop's remote-input portal instead. Allow it once; the choice is remembered. Once you've logged out and in, the extension takes over and the portal isn't used. Text typed through the portal isn't also copied to the clipboard, and characters your keyboard layout can't produce are skipped.
 
 **Nothing is typed, the text lands on the clipboard.** Neither the extension nor the portal could type (you declined the portal's dialog, for instance). Log out and back in once after installing; Settings → Shortcuts & Engine shows the extension's status.
+
+**"No sound. Microphone muted?"** The microphone is sending pure silence. That's almost always a mute: the headset's mute button or boom arm, or another app (Discord, a video call) that muted it. Unmute it, or pick another microphone in Settings → Recording.
 
 **"Didn't hear anything."** The microphone is muted, too quiet, or the wrong one. Pick it explicitly in Settings → Recording, and check the level meter on the pill moves when you speak.
 

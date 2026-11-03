@@ -17,6 +17,7 @@ Gst.init(None)
 RATE = 16000
 CAPS = f"audio/x-raw,format=S16LE,rate={RATE},channels=1"
 SPEECH_DB = -42  # RMS above this counts as speaking (silence auto-stop, empty takes)
+FLAT_DB = -90  # even a quiet room is louder than this: below it the microphone is muted or sends nothing
 TAIL_MS = 200  # keep recording briefly after stop, so the last word isn't clipped
 
 
@@ -192,6 +193,11 @@ class Recorder:
             elif now - self._quiet_since >= limit and self.on_auto_stop:
                 self._spoke = False  # fire once
                 self.on_auto_stop()
+
+    @property
+    def flat(self):
+        """True while the take has had no sound at all, not even background noise."""
+        return self.peak_db < FLAT_DB
 
     def _on_limit(self):
         self._limit_id = 0
